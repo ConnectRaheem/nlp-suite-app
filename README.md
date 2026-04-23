@@ -16,19 +16,9 @@
 
 ---
 
-## 📸 Screenshots
-
-| Home | Text Summarizer |
-|------|----------------|
-| ![Home](screenshots/home.png) | ![Summarizer](screenshots/summarizer.png) |
-
-| NER | Keyword Extractor |
-|-----|------------------|
-| ![NER](screenshots/ner.png) | ![Keywords](screenshots/keywords.png) |
+## 🚀 Features & Tools
 
 ---
-
-## 🚀 Features & Tools
 
 ### 🔵 1. Text Summarizer
 Automatically condenses long articles, reports, or paragraphs into concise summaries.
@@ -53,16 +43,22 @@ Automatically condenses long articles, reports, or paragraphs into concise summa
 **Performance (ROUGE Scores on CNN/DailyMail):**
 | Metric | Score |
 |--------|-------|
-| ROUGE-1 | 37.4 |
-| ROUGE-2 | 17.3 |
-| ROUGE-L | 34.0 |
+| ROUGE-1 | 0.322 |
+| ROUGE-2 | 0.116 |
+| ROUGE-L | 0.226 |
 
 > ROUGE (Recall-Oriented Understudy for Gisting Evaluation) measures overlap between generated and reference summaries. Higher is better.
 
-**Visualizations:**
-- 📊 Original vs Summary word count comparison
-- 📉 Compression ratio metric
-- 📋 Side-by-side original and summary display
+### 📊 Summarizer EDA Visualizations
+
+**ROUGE Evaluation — T5-Small vs Industry Standard:**
+![ROUGE Evaluation](images/summarizer_rouge_evaluation.png)
+
+**CNN/DailyMail Dataset — Text Length Analysis:**
+![Text Length Analysis](images/summarizer_text_length_analysis.png)
+
+**Most Common Words — Articles vs Summaries:**
+![Common Words](images/summarizer_common_words.png)
 
 ---
 
@@ -106,10 +102,10 @@ Identifies and classifies named entities such as people, organizations, location
 
 > 💡 **Tip:** Capitalize proper nouns (Names, Places, Organizations) for best NER results.
 
-**Visualizations:**
-- 🏷️ Color-coded entity tags
-- 📊 Entity distribution bar chart
-- 📋 Full entity table with descriptions
+### 📊 NER EDA Visualizations
+
+**Entity Label Distribution:**
+![NER Entity Distribution](images/ner_entity_distribution.png)
 
 ---
 
@@ -133,15 +129,6 @@ Discovers the most relevant keywords and key phrases from any text using semanti
 | Training Data | 1 Billion Sentence Pairs |
 | Embedding Dim | 384 |
 
-**Performance (Inspec Dataset):**
-| Metric | Score |
-|--------|-------|
-| F1 Score | 39.8% |
-| Precision | 45.2% |
-| Recall | 35.7% |
-
-> KeyBERT outperforms TF-IDF and RAKE on semantic relevance tasks.
-
 **Key Parameters:**
 | Parameter | Description | Default |
 |-----------|-------------|---------|
@@ -149,10 +136,13 @@ Discovers the most relevant keywords and key phrases from any text using semanti
 | diversity | MMR diversity score (0-1) | 0.5 |
 | ngram_range | Unigrams and bigrams | (1,2) |
 
-**Visualizations:**
-- 🏷️ Keyword tags with relevance scores
-- 📊 Lollipop chart of keyword scores
-- ☁️ Word cloud of extracted keywords
+### 📊 Keyword Extractor EDA Visualizations
+
+**Extracted Keywords — Word Cloud:**
+![Keywords Word Cloud](images/keywords_wordcloud.png)
+
+**Keyword Relevance Heatmap Across Topics:**
+![Keywords Heatmap](images/keywords_heatmap.png)
 
 ---
 
@@ -185,10 +175,13 @@ Analyzes readability, grade level, and linguistic complexity of any text.
 | 30-49 | Difficult 🧠 | College |
 | 0-29 | Very Difficult 🎓 | Professional |
 
-**Visualizations:**
-- 📊 Grade level comparison bar chart
-- 🕸️ Text complexity radar chart
-- 📋 Full statistics table
+### 📊 Text Statistics EDA Visualizations
+
+**Grade Level Comparison Across Readability Metrics:**
+![Grade Level Comparison](images/textstats_grade_level_comparison.png)
+
+**Text Complexity Radar Chart:**
+![Radar Chart](images/textstats_radar_chart.png)
 
 ---
 
@@ -225,6 +218,16 @@ nlp-suite-app/
 │   ├── 02_ner_spacy.ipynb          # spaCy NER analysis
 │   ├── 03_keywords_keybert.ipynb   # KeyBERT exploration
 │   └── 04_textstats_eda.ipynb      # Text statistics EDA
+│
+├── images/                         # EDA visualizations
+│   ├── summarizer_rouge_evaluation.png
+│   ├── summarizer_text_length_analysis.png
+│   ├── summarizer_common_words.png
+│   ├── ner_entity_distribution.png
+│   ├── keywords_wordcloud.png
+│   ├── keywords_heatmap.png
+│   ├── textstats_grade_level_comparison.png
+│   └── textstats_radar_chart.png
 │
 ├── requirements.txt                # All dependencies
 └── README.md                       # This file
@@ -274,9 +277,9 @@ streamlit run app.py
 
 | Tool | Model | Size | Speed | Accuracy |
 |------|-------|------|-------|----------|
-| Summarizer | T5-Small | 240MB | Medium | ROUGE-1: 37.4 |
+| Summarizer | T5-Small | 240MB | Medium | ROUGE-1: 0.322 |
 | NER | en_core_web_sm | 12MB | ⚡ Fast | F1: 84.2% |
-| Keywords | all-MiniLM-L6-v2 | 90MB | ⚡ Fast | F1: 39.8% |
+| Keywords | all-MiniLM-L6-v2 | 90MB | ⚡ Fast | MMR-based |
 | Text Stats | textstat (rules) | 0MB | ⚡ Instant | Rule-based |
 
 ---

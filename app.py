@@ -24,19 +24,14 @@ st.set_page_config(
 # ─────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Main background */
     .stApp {
         background-color: #0D1117;
         color: #E6EDF3;
     }
-
-    /* Sidebar */
     [data-testid="stSidebar"] {
         background-color: #161B22;
         border-right: 1px solid #30363D;
     }
-
-    /* Cards */
     .card {
         background-color: #161B22;
         border: 1px solid #30363D;
@@ -44,8 +39,6 @@ st.markdown("""
         padding: 20px;
         margin: 10px 0px;
     }
-
-    /* Metric cards */
     .metric-card {
         background-color: #1C2128;
         border: 1px solid #30363D;
@@ -54,33 +47,26 @@ st.markdown("""
         text-align: center;
         margin: 5px;
     }
-
     .metric-value {
         font-size: 28px;
         font-weight: bold;
         margin: 0;
     }
-
     .metric-label {
         font-size: 12px;
         color: #8B949E;
         margin: 0;
     }
-
-    /* Tool title */
     .tool-title {
         font-size: 32px;
         font-weight: bold;
         margin-bottom: 5px;
     }
-
     .tool-desc {
         font-size: 15px;
         color: #8B949E;
         margin-bottom: 20px;
     }
-
-    /* Buttons */
     .stButton > button {
         background: linear-gradient(90deg, #238636, #2EA043);
         color: white;
@@ -92,13 +78,10 @@ st.markdown("""
         width: 100%;
         transition: all 0.3s;
     }
-
     .stButton > button:hover {
         background: linear-gradient(90deg, #2EA043, #3FB950);
         transform: translateY(-2px);
     }
-
-    /* Text area */
     .stTextArea > div > div > textarea {
         background-color: #1C2128;
         color: #E6EDF3;
@@ -106,8 +89,6 @@ st.markdown("""
         border-radius: 8px;
         font-size: 15px;
     }
-
-    /* Tags/badges */
     .tag {
         display: inline-block;
         padding: 4px 12px;
@@ -116,14 +97,10 @@ st.markdown("""
         font-weight: bold;
         margin: 3px;
     }
-
-    /* Divider */
     .divider {
         border-top: 1px solid #30363D;
         margin: 20px 0;
     }
-
-    /* Header banner */
     .header-banner {
         background: linear-gradient(135deg, #1C2128, #161B22);
         border: 1px solid #30363D;
@@ -132,20 +109,13 @@ st.markdown("""
         margin-bottom: 30px;
         text-align: center;
     }
-
-    /* Hide streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
-
-    /* Selectbox */
     .stSelectbox > div > div {
         background-color: #1C2128;
         color: #E6EDF3;
         border: 1px solid #30363D;
     }
-
-    /* Success/info boxes */
     .stAlert {
         background-color: #1C2128;
         border: 1px solid #30363D;
@@ -160,9 +130,13 @@ st.markdown("""
 # ─────────────────────────────────────────
 @st.cache_resource
 def load_summarizer():
-    from transformers import pipeline
+    from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+    model_name = "t5-small"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     return pipeline("summarization",
-                    model="t5-small",
+                    model=model,
+                    tokenizer=tokenizer,
                     device=-1,
                     framework="pt")
 
@@ -195,16 +169,16 @@ with st.sidebar:
                 unsafe_allow_html=True)
 
     tool = st.selectbox(
-    "Select a Tool",
-    options=[
-        "🏠  Home",
-        "🔵  Text Summarizer",
-        "🟢  Named Entity Recognition",
-        "🟡  Keyword Extractor",
-        "🟠  Text Statistics"
-    ],
-    label_visibility="collapsed"
-)
+        "Select a Tool",
+        options=[
+            "🏠  Home",
+            "🔵  Text Summarizer",
+            "🟢  Named Entity Recognition",
+            "🟡  Keyword Extractor",
+            "🟠  Text Statistics"
+        ],
+        label_visibility="collapsed"
+    )
 
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
@@ -349,7 +323,6 @@ elif "Summarizer" in tool:
         st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
         st.markdown("### 📊 Results")
 
-        # Metrics
         col1, col2, col3, col4 = st.columns(4)
         orig_words = len(text_input.split())
         summ_words = len(summary.split())
@@ -419,7 +392,7 @@ elif "Entity" in tool:
 
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
-    st.info("💡 Tip: Capitalize proper nouns (Names, Places, Organizations) for best results! e.g. 'Raheem Khan from Gilgit Baltistan'")
+    st.info("💡 Tip: Capitalize proper nouns (Names, Places, Organizations) for best results!")
 
     text_input = st.text_area(
         "📝 Enter your text here",
@@ -449,7 +422,6 @@ elif "Entity" in tool:
             st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
             st.markdown("### 📊 Results")
 
-            # Metrics
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.markdown(f"""
@@ -475,7 +447,6 @@ elif "Entity" in tool:
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-            # Color tags per entity type
             label_colors = {
                 "PERSON": "#58A6FF", "ORG": "#3FB950",
                 "GPE": "#D29922",    "DATE": "#F78166",
@@ -500,33 +471,26 @@ elif "Entity" in tool:
 
             with col1:
                 st.markdown("#### 📋 Entity Table")
-                st.dataframe(df_ents, use_container_width=True,
-                             hide_index=True)
+                st.dataframe(df_ents, use_container_width=True, hide_index=True)
 
             with col2:
                 st.markdown("#### 📊 Entity Distribution")
                 label_counts = df_ents["Label"].value_counts()
-                colors_list = [label_colors.get(l, "#8B949E")
-                               for l in label_counts.index]
+                colors_list = [label_colors.get(l, "#8B949E") for l in label_counts.index]
 
                 fig, ax = plt.subplots(figsize=(8, 5))
                 fig.patch.set_facecolor("#161B22")
                 ax.set_facecolor("#161B22")
-                bars = ax.barh(label_counts.index,
-                               label_counts.values,
-                               color=colors_list)
-                ax.set_title("Entity Label Distribution",
-                             color="#E6EDF3", fontsize=13)
+                bars = ax.barh(label_counts.index, label_counts.values, color=colors_list)
+                ax.set_title("Entity Label Distribution", color="#E6EDF3", fontsize=13)
                 ax.tick_params(colors="#8B949E")
                 ax.spines["top"].set_visible(False)
                 ax.spines["right"].set_visible(False)
                 ax.spines["bottom"].set_color("#30363D")
                 ax.spines["left"].set_color("#30363D")
                 for bar, val in zip(bars, label_counts.values):
-                    ax.text(bar.get_width() + 0.1, bar.get_y() +
-                            bar.get_height()/2,
-                            str(val), va="center",
-                            color="#E6EDF3", fontsize=10)
+                    ax.text(bar.get_width() + 0.1, bar.get_y() + bar.get_height()/2,
+                            str(val), va="center", color="#E6EDF3", fontsize=10)
                 plt.tight_layout()
                 st.pyplot(fig)
         else:
@@ -558,7 +522,7 @@ elif "Keyword" in tool:
         )
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
-        top_n    = st.slider("Number of Keywords", 3, 15, 5)
+        top_n     = st.slider("Number of Keywords", 3, 15, 5)
         diversity = st.slider("Diversity", 0.0, 1.0, 0.5)
 
     analyze_btn = st.button("🚀 Extract Keywords")
@@ -581,7 +545,6 @@ elif "Keyword" in tool:
         df_kw = pd.DataFrame(keywords, columns=["Keyword", "Score"])
         df_kw["Score"] = df_kw["Score"].round(4)
 
-        # Metrics
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown(f"""
@@ -592,27 +555,21 @@ elif "Keyword" in tool:
         with col2:
             st.markdown(f"""
             <div class='metric-card'>
-                <p class='metric-value' style='color:#3FB950;'>
-                    {df_kw['Score'].max():.3f}
-                </p>
+                <p class='metric-value' style='color:#3FB950;'>{df_kw['Score'].max():.3f}</p>
                 <p class='metric-label'>Top Score</p>
             </div>""", unsafe_allow_html=True)
         with col3:
             st.markdown(f"""
             <div class='metric-card'>
-                <p class='metric-value' style='color:#58A6FF;'>
-                    {df_kw['Score'].mean():.3f}
-                </p>
+                <p class='metric-value' style='color:#58A6FF;'>{df_kw['Score'].mean():.3f}</p>
                 <p class='metric-label'>Avg Score</p>
             </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Keyword tags
         st.markdown("#### 🏷️ Extracted Keywords")
         tags_html = ""
         for _, row in df_kw.iterrows():
-            opacity = int(row["Score"] * 255)
             tags_html += f"""
             <span class='tag' style='background-color:#D2992222;
                   color:#D29922; border:1px solid #D29922;'>
@@ -635,24 +592,15 @@ elif "Keyword" in tool:
             fig, ax = plt.subplots(figsize=(8, 5))
             fig.patch.set_facecolor("#161B22")
             ax.set_facecolor("#161B22")
-
-            colors_grad = plt.cm.YlOrBr(
-                np.linspace(0.3, 0.9, len(df_sorted))
-            )
-            ax.hlines(y=df_sorted["Keyword"],
-                      xmin=0, xmax=df_sorted["Score"],
+            colors_grad = plt.cm.YlOrBr(np.linspace(0.3, 0.9, len(df_sorted)))
+            ax.hlines(y=df_sorted["Keyword"], xmin=0, xmax=df_sorted["Score"],
                       color="#30363D", linewidth=2)
             ax.scatter(df_sorted["Score"], df_sorted["Keyword"],
                        color=colors_grad, s=100, zorder=5)
-
-            for score, keyword in zip(df_sorted["Score"],
-                                       df_sorted["Keyword"]):
-                ax.text(score + 0.01, keyword,
-                        f"{score:.3f}", va="center",
+            for score, keyword in zip(df_sorted["Score"], df_sorted["Keyword"]):
+                ax.text(score + 0.01, keyword, f"{score:.3f}", va="center",
                         color="#E6EDF3", fontsize=9)
-
-            ax.set_title("Keyword Relevance Scores",
-                         color="#E6EDF3", fontsize=13)
+            ax.set_title("Keyword Relevance Scores", color="#E6EDF3", fontsize=13)
             ax.set_xlabel("Score", color="#8B949E")
             ax.tick_params(colors="#8B949E")
             ax.set_xlim(0, 1.15)
@@ -663,14 +611,10 @@ elif "Keyword" in tool:
             plt.tight_layout()
             st.pyplot(fig)
 
-        # Pro Word Cloud
         st.markdown("#### ☁️ Keyword Cloud")
         keyword_dict = dict(keywords)
-        colors_wc = ["#D29922", "#F0B429", "#FFC940",
-                     "#FFE0A3", "#8B6914"]
-        custom_cmap = LinearSegmentedColormap.from_list(
-            "gold", colors_wc
-        )
+        colors_wc = ["#D29922", "#F0B429", "#FFC940", "#FFE0A3", "#8B6914"]
+        custom_cmap = LinearSegmentedColormap.from_list("gold", colors_wc)
         wordcloud = WordCloud(
             width=1400, height=500,
             background_color="#0D1117",
@@ -719,28 +663,21 @@ elif "Statistics" in tool:
         with st.spinner("📊 Calculating text statistics..."):
             import textstat
             stats = {
-                "word_count"          : textstat.lexicon_count(text_input,
-                                                                removepunct=True),
+                "word_count"          : textstat.lexicon_count(text_input, removepunct=True),
                 "sentence_count"      : textstat.sentence_count(text_input),
                 "syllable_count"      : textstat.syllable_count(text_input),
                 "difficult_words"     : textstat.difficult_words(text_input),
-                "avg_words_per_sent"  : round(textstat.avg_sentence_length(
-                                              text_input), 2),
-                "flesch_reading_ease" : round(textstat.flesch_reading_ease(
-                                              text_input), 2),
-                "flesch_kincaid_grade": round(textstat.flesch_kincaid_grade(
-                                              text_input), 2),
+                "avg_words_per_sent"  : round(textstat.avg_sentence_length(text_input), 2),
+                "flesch_reading_ease" : round(textstat.flesch_reading_ease(text_input), 2),
+                "flesch_kincaid_grade": round(textstat.flesch_kincaid_grade(text_input), 2),
                 "gunning_fog"         : round(textstat.gunning_fog(text_input), 2),
                 "smog_index"          : round(textstat.smog_index(text_input), 2),
-                "ari_score"           : round(
-                                        textstat.automated_readability_index(
-                                        text_input), 2)
+                "ari_score"           : round(textstat.automated_readability_index(text_input), 2)
             }
 
         st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
         st.markdown("### 📊 Results")
 
-        # Readability label
         fre = stats["flesch_reading_ease"]
         if fre >= 80:
             read_label = "Very Easy 😊"
@@ -755,23 +692,19 @@ elif "Statistics" in tool:
             read_label = "Very Difficult 🧠"
             read_color = "#FF7B72"
 
-        # Top metrics row
         col1, col2, col3, col4, col5 = st.columns(5)
         metrics = [
-            (stats["word_count"],      "Words",          "#58A6FF"),
-            (stats["sentence_count"],  "Sentences",      "#3FB950"),
-            (stats["difficult_words"], "Difficult Words", "#D29922"),
-            (stats["flesch_reading_ease"], "Reading Ease", read_color),
-            (read_label,               "Level",          read_color),
+            (stats["word_count"],          "Words",          "#58A6FF"),
+            (stats["sentence_count"],      "Sentences",      "#3FB950"),
+            (stats["difficult_words"],     "Difficult Words", "#D29922"),
+            (stats["flesch_reading_ease"], "Reading Ease",   read_color),
+            (read_label,                   "Level",          read_color),
         ]
-        for col, (val, label, color) in zip(
-            [col1, col2, col3, col4, col5], metrics
-        ):
+        for col, (val, label, color) in zip([col1, col2, col3, col4, col5], metrics):
             with col:
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <p class='metric-value' style='color:{color};
-                       font-size:22px;'>{val}</p>
+                    <p class='metric-value' style='color:{color}; font-size:22px;'>{val}</p>
                     <p class='metric-label'>{label}</p>
                 </div>""", unsafe_allow_html=True)
 
@@ -781,37 +714,27 @@ elif "Statistics" in tool:
 
         with col1:
             st.markdown("#### 📋 Full Statistics Table")
-            df_stats = pd.DataFrame(
-                stats.items(), columns=["Metric", "Value"]
-            )
-            st.dataframe(df_stats, use_container_width=True,
-                         hide_index=True)
+            df_stats = pd.DataFrame(stats.items(), columns=["Metric", "Value"])
+            st.dataframe(df_stats, use_container_width=True, hide_index=True)
 
         with col2:
             st.markdown("#### 📊 Grade Level Comparison")
             grade_metrics = {
-                "FK Grade"  : stats["flesch_kincaid_grade"],
+                "FK Grade"   : stats["flesch_kincaid_grade"],
                 "Gunning Fog": stats["gunning_fog"],
-                "SMOG Index": stats["smog_index"],
-                "ARI Score" : stats["ari_score"]
+                "SMOG Index" : stats["smog_index"],
+                "ARI Score"  : stats["ari_score"]
             }
             fig, ax = plt.subplots(figsize=(8, 5))
             fig.patch.set_facecolor("#161B22")
             ax.set_facecolor("#161B22")
             colors_list = ["#58A6FF", "#3FB950", "#D29922", "#F78166"]
-            bars = ax.bar(grade_metrics.keys(),
-                          grade_metrics.values(),
-                          color=colors_list,
-                          edgecolor="#0D1117",
-                          width=0.5)
+            bars = ax.bar(grade_metrics.keys(), grade_metrics.values(),
+                          color=colors_list, edgecolor="#0D1117", width=0.5)
             for bar, val in zip(bars, grade_metrics.values()):
-                ax.text(bar.get_x() + bar.get_width()/2,
-                        bar.get_height() + 0.2,
-                        str(val), ha="center",
-                        color="#E6EDF3", fontsize=11,
-                        fontweight="bold")
-            ax.set_title("Readability Grade Levels",
-                         color="#E6EDF3", fontsize=13)
+                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.2,
+                        str(val), ha="center", color="#E6EDF3", fontsize=11, fontweight="bold")
+            ax.set_title("Readability Grade Levels", color="#E6EDF3", fontsize=13)
             ax.set_ylabel("Grade Level", color="#8B949E")
             ax.tick_params(colors="#8B949E")
             ax.spines["top"].set_visible(False)
@@ -821,7 +744,6 @@ elif "Statistics" in tool:
             plt.tight_layout()
             st.pyplot(fig)
 
-        # Radar Chart
         st.markdown("#### 🕸️ Text Complexity Radar")
         radar_data = {
             "FK Grade"    : stats["flesch_kincaid_grade"],
@@ -833,29 +755,25 @@ elif "Statistics" in tool:
         labels  = list(radar_data.keys())
         values  = list(radar_data.values())
         max_val = max(values) if max(values) > 0 else 1
-        values_norm = [v / max_val for v in values]
+        values_norm  = [v / max_val for v in values]
         values_norm += values_norm[:1]
 
         N      = len(labels)
         angles = [n / float(N) * 2 * np.pi for n in range(N)]
         angles += angles[:1]
 
-        fig, ax = plt.subplots(figsize=(7, 7),
-                               subplot_kw=dict(polar=True))
+        fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True))
         fig.patch.set_facecolor("#161B22")
         ax.set_facecolor("#1C2128")
-        ax.plot(angles, values_norm, "o-",
-                linewidth=2, color="#F78166")
+        ax.plot(angles, values_norm, "o-", linewidth=2, color="#F78166")
         ax.fill(angles, values_norm, alpha=0.2, color="#F78166")
         ax.set_xticks(angles[:-1])
         ax.set_xticklabels(labels, color="#E6EDF3", fontsize=11)
         ax.set_yticks([0.25, 0.5, 0.75, 1.0])
-        ax.set_yticklabels(["25%", "50%", "75%", "100%"],
-                           color="#8B949E", fontsize=8)
+        ax.set_yticklabels(["25%", "50%", "75%", "100%"], color="#8B949E", fontsize=8)
         ax.grid(color="#30363D", linewidth=0.5)
         ax.spines["polar"].set_color("#30363D")
-        ax.set_title("Text Complexity Profile",
-                     color="#E6EDF3", fontsize=13,
+        ax.set_title("Text Complexity Profile", color="#E6EDF3", fontsize=13,
                      fontweight="bold", pad=20)
         plt.tight_layout()
         st.pyplot(fig)

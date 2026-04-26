@@ -12,7 +12,7 @@
 
 ## 🌐 Live Demo
 
-👉 **[Click here to try the app](https://share.streamlit.io)** *(replace with your deployed URL)*
+👉 **[Click here to try the app]([https://share.streamlit.io](https://nlp-suite-app-raheemkhan.streamlit.app/))** 
 
 ---
 
